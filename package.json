@@ -2,7 +2,7 @@
   "name": "neovim-db",
   "version": "1.0.0",
   "description": "Database plugin for neovim",
-  "main": "index.js",
+  "main": "src/plugin.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +24,10 @@
   "homepage": "https://github.com/paulocesar/neovim-db#readme",
   "dependencies": {
     "knex": "^0.21.1",
-    "tedious": "^8.3.0"
+    "mssql": "^6.2.0",
+    "mysql": "^2.18.1",
+    "oracledb": "^4.2.0",
+    "pg": "^8.1.0",
+    "sqlite3": "^4.2.0"
   }
 }

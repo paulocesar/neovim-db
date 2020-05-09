@@ -15,29 +15,29 @@ nnoremap <F5> :DbRunQuery<CR>
 ```
 
 
-set your DB settings in `~/.nvim-db.js`:
+set your DB settings in `~/.nvim-db.json`:
 
-```js
-module.exports = {
-    default: {
-        client: 'mssql',
-        connection: {
-            host: 'host1',
-            username: 'user1',
-            password: 'pw1,
-            database: 'db1'
-        }
-    }
-    anotherLabel: {
-        client: 'mysql',
-        connection: {
-            host: 'host2',
-            username: 'user2',
-            password: 'pw2',
-            database: 'db2'
+```json
+{
+    "default": {
+        "client": "mssql",
+        "connection": {
+            "host": "host1",
+            "user": "user1",
+            "password": "pw1",
+            "database": "db1"
         }
     },
-};
+    "anotherLabel": {
+        "client": "mysql",
+        "connection": {
+            "host": "host2",
+            "user": "user2",
+            "password": "pw2",
+            "database": "db2"
+        }
+    }
+}
 ```
 
 example of query:

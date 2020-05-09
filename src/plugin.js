@@ -1,5 +1,5 @@
 const path = require('path');
-const QueryRunner = require('./src/query-runner');
+const QueryRunner = require('./query-runner');
 
 module.exports = (plugin) => {
     const extension = '.txt';
@@ -7,9 +7,12 @@ module.exports = (plugin) => {
     const { nvim } = plugin;
 
     async function createWindow() {
-        nvim.command(`split ${defaultFilename}${extension}`);
-        const windows = await nvim.windows;
+        let windows = await nvim.windows;
+        const lastWindow = await windows[windows.length - 1];
+        nvim.window = lastWindow;
+        await nvim.command(`split ${defaultFilename}${extension}`);
 
+        windows = await nvim.windows;
         const window = await windows[windows.length - 1];
         const buffer = await window.buffer;
         buffer.name = defaultFilename;
@@ -33,7 +36,7 @@ module.exports = (plugin) => {
     async function runQuery(windowQuery, windowResult) {
         const queryBuffer = await windowQuery.buffer;
         const queryLines = await queryBuffer.lines;
-        const r = new QueryRunner(queryLines.join('\n'));
+        const r = new QueryRunner(queryLines);
 
         nvim.window = windowResult;
         await nvim.command('1,$d');
