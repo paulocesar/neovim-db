@@ -1,4 +1,5 @@
 const path = require('path');
+const QueryRunner = require('./src/query-runner');
 
 module.exports = (plugin) => {
     const extension = '.txt';
@@ -30,15 +31,13 @@ module.exports = (plugin) => {
     }
 
     async function runQuery(windowQuery, windowResult) {
-        const lines = [
-            'hello world!',
-            'this is a test',
-            (new Date().toString())
-        ];
+        const queryBuffer = await windowQuery.buffer;
+        const queryLines = await queryBuffer.lines;
+        const r = new QueryRunner(queryLines.join('\n'));
 
         nvim.window = windowResult;
         await nvim.command('1,$d');
-        await windowResult.buffer.insert(lines, 0);
+        await windowResult.buffer.insert(await r.results(), 0);
     }
 
     plugin.setOptions({ dev: true });

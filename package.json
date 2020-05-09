@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/paulocesar/neovim-db#readme",
   "dependencies": {
-    "knex": "^0.21.1"
+    "knex": "^0.21.1",
+    "tedious": "^8.3.0"
   }
 }
