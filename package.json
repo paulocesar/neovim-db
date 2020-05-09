@@ -1,0 +1,28 @@
+{
+  "name": "neovim-db",
+  "version": "1.0.0",
+  "description": "Database plugin for neovim",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulocesar/neovim-db.git"
+  },
+  "keywords": [
+    "nvim",
+    "neovim",
+    "database",
+    "plugin"
+  ],
+  "author": "Paulo Cesar <metasoft.brasil@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/paulocesar/neovim-db/issues"
+  },
+  "homepage": "https://github.com/paulocesar/neovim-db#readme",
+  "dependencies": {
+    "knex": "^0.21.1"
+  }
+}
