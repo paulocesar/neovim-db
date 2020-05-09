@@ -80,7 +80,7 @@ class QueryRunner {
     }
 
     formatResults(results) {
-        return [ JSON.stringify(results) ];
+        return JSON.stringify(results, null, 4).split('\n');
     }
 }
 

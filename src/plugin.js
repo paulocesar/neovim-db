@@ -41,6 +41,7 @@ module.exports = (plugin) => {
         nvim.window = windowResult;
         await nvim.command('1,$d');
         await windowResult.buffer.insert(await r.results(), 0);
+        await nvim.command('1');
     }
 
     plugin.setOptions({ dev: true });
