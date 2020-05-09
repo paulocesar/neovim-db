@@ -7,14 +7,15 @@ usage:
 :DbRunQuery
 ```
 
-shortcup suggestion:
+shortcut suggestion:
 
 ```vim
+" run a query when press F5
 nnoremap <F5> :DbRunQuery<CR>
 ```
 
 
-set your DB configurations in `~/.nvim-db.js`:
+set your DB settings in `~/.nvim-db.js`:
 
 ```js
 module.exports = {
