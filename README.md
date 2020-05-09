@@ -3,7 +3,7 @@ Database plugin for neovim
 
 usage:
 
-```
+```vim
 :DbRunQuery
 ```
 
