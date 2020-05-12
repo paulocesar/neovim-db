@@ -17,18 +17,27 @@ class QueryRunner {
         this.loadSettins();
         if (!this.hasGoodSettings) { return; }
 
-        let firstLine = nvimLines.filter((l) => l.trim())[0];
+        const lines = nvimLines.map((l) => l.trim()).filter((l) => l);
 
-        let commands = [];
-        if (firstLine && firstLine.startsWith('-->')) {
-            commands = firstLine.replace('-->', '').trim().split(/\s+/g);
+        this.queries = [ ];
+        let query = { sql: '', settings: this.buildSettingsForQuery() };
+
+        for (const line of lines) {
+            const isSettings = line.startsWith('-->');
+
+            if (isSettings) {
+                if (query.sql) {
+                    this.queries.push(query);
+                    query = { sql: '' };
+                }
+                query.settings = this.buildSettingsForQuery(line);
+                console.log(query.settings);
+            }
+
+            query.sql = `${query.sql}\n${line}`.trim();
         }
 
-        this.currentSettings = this.dbSettings[commands[0]] ||
-            this.dbSettings.default;
-        this.currentSettings.multipleStatements = true;
-
-        this.sql = nvimLines.join('\n');
+        if (query.sql) { this.queries.push(query); }
     }
 
     loadSettins() {
@@ -54,6 +63,36 @@ class QueryRunner {
         }
     }
 
+
+    buildSettingsForQuery(line) {
+        const outputs = {
+            visualize: (t, r) => this.toVisualizationTable(t, r),
+            json: (t, r) => this.toJson(t, r)
+        }
+
+        const settings = { output: outputs.visualize,
+            db: this.dbSettings.default, title: 'QUERY RESULT' };
+
+        if (!line) { return settings; }
+
+        try {
+            const json = JSON.parse(line.replace('-->', '').trim());
+            if (json.db) {
+                settings.db = this.dbSettings[json.db] ||
+                    this.dbSettings.default;
+            }
+            if (json.output) {
+                settings.output = outputs[json.output] ||
+                    outputs.visualize;
+            }
+            if (json.title) { settings.title = json.title || 'QUERY RESULT'; }
+        } catch(ex) {
+            return settings;
+        }
+
+        return settings;
+    }
+
     async results() {
         if (!this.hasDbSettings) {
             return this.errorResults(
@@ -64,13 +103,23 @@ class QueryRunner {
             return this.errorResults('~/.nvim-db.json has a bad configuration');
         }
 
-        try {
-            const db = knex(this.currentSettings);
-            const results = await db.raw(this.sql);
-            return this.formatResults(results);
-        } catch(ex) {
-            return ex.toString().split('\n');
+        let lines = [ ];
+        for (const q of this.queries) {
+            try {
+                const { sql, settings } = q;
+
+                const db = knex(settings.db);
+                const results = await db.raw(sql);
+
+                const formatted = settings.output(settings.title, results);
+                lines = lines.concat(formatted).concat([ '', '' ]);
+            } catch(ex) {
+                lines = lines.concat(ex.toString().split('\n'))
+                    .concat([ '', '' ]);
+            }
         }
+
+        return lines;
     }
 
     errorResults(msg) {
@@ -80,16 +129,14 @@ class QueryRunner {
         ];
     }
 
-    formatResults(results) {
-        if (!results.length) { return [ ]; }
-        return this.toVisualizationTable(results);
+    toJson(title, results) {
+        const lines = [ ];
+        if (title) { lines.push(`/* === ${title} === */`); }
+
+        return lines.concat(JSON.stringify(results, null, 4).split('\n'));
     }
 
-    toJson(results) {
-        return JSON.stringify(results, null, 4).split('\n');
-    }
-
-    toVisualizationTable(results) {
+    toVisualizationTable(title, results) {
         const countLen = `${results.length}`.length;
         const cols = [ ];
 
@@ -135,6 +182,10 @@ class QueryRunner {
 
         if (lines[0] && lines[0].length) {
             displayLines = displayLines.concat(lines);
+        }
+
+        if (title) {
+            return [ `=== ${title} ===`, '' ].concat(displayLines);
         }
 
         return displayLines;
