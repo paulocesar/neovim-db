@@ -5,6 +5,9 @@ describe('QueryRunner', function() {
     it('should format a result', async function() {
         const nvimLines = [
             'select 1',
+            '-->',
+            'select Id, DmsId, Vin, Make, Model, Year',
+            'from DmsVehicle where DmsCustomerId = 31726310',
             '--> ',
             'select top 5 zDealerID, zMenuID, zVIN, zCustomerLastName',
             'from tblMenu where zDealerID = 1750',

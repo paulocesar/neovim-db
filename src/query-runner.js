@@ -137,6 +137,17 @@ class QueryRunner {
     }
 
     toVisualizationTable(title, results) {
+        let displayLines = [ ];
+
+        if (title) {
+            displayLines = [ `=== ${title} ===`, '' ];
+        }
+
+        if (!results.length) {
+            displayLines.push('(empty)');
+            return displayLines;
+        }
+
         const countLen = `${results.length}`.length;
         const cols = [ ];
 
@@ -149,8 +160,6 @@ class QueryRunner {
 
             cols.push({ name: col, length: maxLen });
         }
-
-        let displayLines = [ ];
 
         let lines = [ ];
         for (const col of cols) {
@@ -182,10 +191,6 @@ class QueryRunner {
 
         if (lines[0] && lines[0].length) {
             displayLines = displayLines.concat(lines);
-        }
-
-        if (title) {
-            return [ `=== ${title} ===`, '' ].concat(displayLines);
         }
 
         return displayLines;
