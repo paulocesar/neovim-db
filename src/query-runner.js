@@ -8,8 +8,9 @@ const configFilename = path.resolve(os.homedir(), '.nvim-db.json');
 const clients = [ 'mssql', 'mysql', 'pg', 'sqlite3', 'mysql2', 'oracledb' ];
 
 class QueryRunner {
-    constructor(nvimLines) {
+    constructor(nvimLines, width) {
         this.hasDbSettings = fs.existsSync(configFilename);
+        this.width = width;
 
         if (!this.hasDbSettings) { return; }
 
@@ -80,7 +81,63 @@ class QueryRunner {
     }
 
     formatResults(results) {
+        if (!results.length) { return [ ]; }
+        return this.toVisualizationTable(results);
+    }
+
+    toJson(results) {
         return JSON.stringify(results, null, 4).split('\n');
+    }
+
+    toVisualizationTable(results) {
+        const countLen = `${results.length}`.length;
+        const cols = [ ];
+
+        for (const col of Object.keys(results[0])) {
+            let maxLen = col.length;
+            for (const r of results) {
+                const colLen = `${r[col]}`.length + 1;
+                if (colLen > maxLen) { maxLen = colLen };
+            }
+
+            cols.push({ name: col, length: maxLen });
+        }
+
+        let displayLines = [ ];
+
+        let lines = [ ];
+        for (const col of cols) {
+            if (lines[0] && lines[0].length + col.length > this.width - 1) {
+                displayLines = displayLines.concat(lines).concat([ '', '' ]);
+                lines = [ ];
+            }
+
+            if (!lines[0]) {
+                lines[0] = `${' '.repeat(countLen)}# `;
+                lines[1] = `${'-'.repeat(countLen + 1)} `;
+
+                for (const idx in results) {
+                    const repeatCol = countLen - (idx.toString().length);
+                    lines[Number(idx) + 2] = `${' '.repeat(repeatCol)}#${idx} `
+                }
+            }
+
+            lines[0] +=
+                `${col.name}${' '.repeat(col.length - col.name.length)} `;
+            lines[1] += `${'-'.repeat(col.length)} `;
+            for (const idx in results) {
+                const r = results[idx];
+                const value = `${r[col.name]}`;
+                const whitespace = ' '.repeat(col.length - value.length + 1);
+                lines[Number(idx) + 2] += `${value}${whitespace}`;
+            }
+        }
+
+        if (lines[0] && lines[0].length) {
+            displayLines = displayLines.concat(lines);
+        }
+
+        return displayLines;
     }
 }
 

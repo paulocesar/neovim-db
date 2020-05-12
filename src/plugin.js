@@ -36,16 +36,19 @@ module.exports = (plugin) => {
     async function runQuery(windowQuery, windowResult) {
         const queryBuffer = await windowQuery.buffer;
         const queryLines = await queryBuffer.lines;
-        const r = new QueryRunner(queryLines);
+        const width = await windowResult.width;
+        const r = new QueryRunner(queryLines, width);
 
         nvim.window = windowResult;
         await nvim.command('1,$d');
-        await windowResult.buffer.insert(await r.results(), 0);
+        const lines = await r.results()
+
+        await windowResult.buffer.append(lines, 0);
         await nvim.command('1');
     }
 
     plugin.setOptions({ dev: true });
-    plugin.registerCommand('DbRunQuery', async() => {
+    plugin.registerCommand('DbRunQuery', async function () {
         const windowQuery = await nvim.window;
         const windowResult = await resolveWindowResult();
 
