@@ -31,7 +31,6 @@ class QueryRunner {
                     query = { sql: '' };
                 }
                 query.settings = this.buildSettingsForQuery(line);
-                console.log(query.settings);
             }
 
             query.sql = `${query.sql}\n${line}`.trim();
@@ -67,8 +66,11 @@ class QueryRunner {
     buildSettingsForQuery(line) {
         const outputs = {
             visualize: (t, r) => this.toVisualizationTable(t, r),
-            json: (t, r) => this.toJson(t, r)
-        }
+            json: (t, r) => this.toJson(t, r),
+            markdown: (t, r) => this.toMarkdown(t, r),
+            md: (t, r) => this.toMarkdown(t, r),
+            csv: (t, r) => this.toCsv(t, r)
+        };
 
         const settings = { output: outputs.visualize,
             db: this.dbSettings.default, title: 'QUERY RESULT' };
@@ -124,7 +126,7 @@ class QueryRunner {
 
     errorResults(msg) {
         return [
-            msg, '', 'for more information. visit: ' +
+            msg, '', 'for more information: ' +
                 'https://github.com/paulocesar/neovim-db'
         ];
     }
@@ -134,6 +136,55 @@ class QueryRunner {
         if (title) { lines.push(`/* === ${title} === */`); }
 
         return lines.concat(JSON.stringify(results, null, 4).split('\n'));
+    }
+
+    toMarkdown(title, results) {
+        const lines = [ ];
+        if (title) {
+            lines.push(`### ${title}`);
+            lines.push('');
+        }
+
+        if (!lines.length) {
+            lines.push('empty');
+            return lines;
+        }
+
+        const keys = Object.keys(results[0]);
+        lines.push(keys.join(' | '));
+
+        const splitter = `:--${' | :--'.repeat(keys.length - 1)}`;
+        lines.push(splitter);
+
+        for (const r of results) {
+            lines.push(Object.values(r).join(' | '));
+        }
+
+        return lines;
+    }
+
+    toCsv(title, results) {
+        const lines = [ ];
+        if (title) {
+            lines.push(`=== ${title} ===`);
+            lines.push('');
+        }
+
+        if (!results.length) { return lines; }
+
+        function format(v) {
+            const f = `${v}`.replace(/"/g, '');
+            return `"${f}"`;
+        }
+
+        const keys = Object.keys(results[0]);
+        lines.push(keys.map(format).join(','));
+
+        for (const r of results) {
+            lines.push(Object.values(r).map(format).join(','));
+        }
+
+        return lines;
     }
 
     toVisualizationTable(title, results) {
