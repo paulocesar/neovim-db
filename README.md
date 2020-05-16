@@ -1,7 +1,7 @@
 # neovim-db
 Database plugin for neovim
 
-usage:
+### Usage
 
 ```vim
 :DbRunQuery
@@ -40,9 +40,6 @@ set your DB settings in `~/.nvim-db.json`:
 }
 ```
 
-example of query:
-```sql
---> anotherLabel
+### Screenshot
 
-SELECT * FROM users WHERE Id = 1
-```
+![neovim-db screenshot](/misc/example.png)
