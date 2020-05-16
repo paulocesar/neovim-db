@@ -1,6 +1,18 @@
 # neovim-db
 Database plugin for neovim
 
+### Screenshot
+
+![neovim-db screenshot](/misc/example.png)
+
+### Install
+
+- clone this repo into `~/.config/nvim/rplugin/node`
+- run a `npm install` in the neovim-db folder
+- open `nvim` and run the `:UpdateRemotePlugins` command
+- create the file `~/.nvim-db.json` (please check the `Usage` section)
+- restart nvim
+
 ### Usage
 
 ```vim
@@ -13,7 +25,6 @@ shortcut suggestion:
 " run a query when press F5
 nnoremap <F5> :DbRunQuery<CR>
 ```
-
 
 set your DB settings in `~/.nvim-db.json`:
 
@@ -39,7 +50,3 @@ set your DB settings in `~/.nvim-db.json`:
     }
 }
 ```
-
-### Screenshot
-
-![neovim-db screenshot](/misc/example.png)
