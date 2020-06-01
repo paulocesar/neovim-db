@@ -47,8 +47,7 @@ module.exports = (plugin) => {
         await nvim.command('1');
     }
 
-    plugin.setOptions({ dev: true });
-    plugin.registerCommand('DbRunQuery', async function () {
+    plugin.registerCommand('DbRunQuery', async function() {
         const windowQuery = await nvim.window;
         const windowResult = await resolveWindowResult();
 
