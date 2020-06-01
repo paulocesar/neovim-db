@@ -7,6 +7,7 @@ Database plugin for neovim
 
 ### Install
 
+- `npm install -g neovim`
 - clone this repo into `~/.config/nvim/rplugin/node`
 - run a `npm install` in the neovim-db folder
 - open `nvim` and run the `:UpdateRemotePlugins` command
