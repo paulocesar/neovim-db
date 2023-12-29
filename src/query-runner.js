@@ -59,6 +59,8 @@ class QueryRunner {
                 this.hasGoodSettings = false;
                 break;
             }
+
+            s.connection.multipleStatements = true;
         }
     }
 
@@ -190,14 +192,43 @@ class QueryRunner {
     toVisualizationTable(title, results) {
         let displayLines = [ ];
 
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            displayLines = [ `=== ${title} ===`, '' ];
+            addLine(`=== ${title} ===`);
+            addLine('');
         }
 
         if (!results.length) {
-            displayLines.push('(empty)');
+            addLine('(empty)');
             return displayLines;
         }
+
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildVisualizationTable(g));
+        }
+
+        return displayLines;
+    }
+
+    _buildVisualizationTable(results) {
+        let displayLines = [ ];
 
         const countLen = `${results.length}`.length;
         const cols = [ ];

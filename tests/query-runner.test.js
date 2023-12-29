@@ -56,13 +56,26 @@ First | Second
 `.trim();
 
 describe('QueryRunner', function() {
+    async function run(query) {
+        const qr = new QueryRunner(query.split('\n'), 40);
+        return qr.results();
+    }
+
     it('should format a result', async function() {
-        const qr = new QueryRunner(sql.split('\n'), 40);
-        const r = await qr.results();
+        const r = await run(sql);
+
 
         assert.equal(
             r.map((l) => l.trim()).join('\n').trim(),
             testResult.split('\n').map((l) => l.trim()).join('\n').trim()
         );
+    });
+
+    it('should run multiple queries', async function() {
+
+        console.log(await run(`
+            SELECT 'a' test1
+            SELECT 'b' test2
+        `.trim()));
     });
 });
