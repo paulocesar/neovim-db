@@ -1,6 +1,6 @@
 {
   "name": "neovim-db",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Database plugin for neovim",
   "main": "src/plugin.js",
   "scripts": {
