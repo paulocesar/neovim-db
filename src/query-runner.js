@@ -5,7 +5,7 @@ const knex = require('knex');
 
 const configFilename = path.resolve(os.homedir(), '.nvim-db.json');
 
-const clients = [ 'mssql', 'mysql', 'pg', 'sqlite3', 'mysql2', 'oracledb' ];
+const clients = ['mssql', 'mysql', 'pg', 'sqlite3', 'mysql2', 'oracledb'];
 
 class QueryRunner {
     constructor(nvimLines, width) {
@@ -42,7 +42,7 @@ class QueryRunner {
     loadSettings() {
         try {
             this.dbSettings = JSON.parse(fs.readFileSync(configFilename));
-        } catch(ex) {
+        } catch (ex) {
             this.hasGoodSettings = false;
             return;
         }
@@ -90,7 +90,7 @@ class QueryRunner {
                     outputs.visualize;
             }
             if (json.title) { settings.title = json.title || 'QUERY RESULT'; }
-        } catch(ex) {
+        } catch (ex) {
             return settings;
         }
 
@@ -116,10 +116,10 @@ class QueryRunner {
                 const results = await db.raw(sql);
 
                 const formatted = settings.output(settings.title, results);
-                lines = lines.concat(formatted).concat([ '', '' ]);
-            } catch(ex) {
+                lines = lines.concat(formatted).concat(['', '']);
+            } catch (ex) {
                 lines = lines.concat(ex.toString().split('\n'))
-                    .concat([ '', '' ]);
+                    .concat(['', '']);
             }
         }
 
@@ -228,7 +228,6 @@ class QueryRunner {
         }
 
         return displayLines;
-
     }
 
     _buildCsv(results) {
@@ -296,7 +295,7 @@ class QueryRunner {
             let maxLen = col.length;
             for (const r of results) {
                 const colLen = `${r[col]}`.length + 1;
-                if (colLen > maxLen) { maxLen = colLen };
+                if (colLen > maxLen) { maxLen = colLen; }
             }
 
             cols.push({ name: col, length: maxLen });
@@ -315,7 +314,7 @@ class QueryRunner {
 
                 for (const idx in results) {
                     const repeatCol = countLen - (idx.toString().length);
-                    lines[Number(idx) + 2] = `${' '.repeat(repeatCol)}#${idx} `
+                    lines[Number(idx) + 2] = `${' '.repeat(repeatCol)}#${idx} `;
                 }
             }
 

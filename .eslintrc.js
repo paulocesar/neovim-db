@@ -22,8 +22,20 @@ module.exports = {
         ecmaVersion: 'latest',
     },
     rules: {
-        indent: ['error', 4],
+        indent: [ 'error', 4 ],
+        'array-bracket-spacing': 'off',
+        'class-methods-use-this': 'off',
         'comma-dangle': 'off',
-        'newline-per-chained-call': 'off'
+        'function-paren-newline': 'off',
+        'guard-for-in': 'off',
+        'newline-per-chained-call': 'off',
+        'no-await-in-loop': 'off',
+        'no-multiple-empty-lines': 'off',
+        'no-restricted-syntax': 'off',
+        'no-underscore-dangle': 'off',
+        'object-curly-newline': 'off',
+        'object-property-newline': 'off',
+        'operator-linebreak': 'off',
+        'prefer-arrow-callback': 'off'
     },
 };
