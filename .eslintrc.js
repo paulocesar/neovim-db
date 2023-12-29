@@ -22,6 +22,8 @@ module.exports = {
         ecmaVersion: 'latest',
     },
     rules: {
-        indent: ["error", 4],
+        indent: ['error', 4],
+        'comma-dangle': 'off',
+        'newline-per-chained-call': 'off'
     },
 };

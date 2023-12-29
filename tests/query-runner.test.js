@@ -1,7 +1,9 @@
+/* globals describe it */
+
 const assert = require('assert');
 const QueryRunner = require('../src/query-runner');
 
-describe('QueryRunner', function() {
+describe('QueryRunner', () => {
     async function run(query) {
         const qr = new QueryRunner(query.split('\n'), 40);
         return qr.results();
@@ -12,11 +14,10 @@ describe('QueryRunner', function() {
         assert.equal(
             r.map((l) => l.trim()).join('\n').trim(),
             expected.trim().split('\n').map((l) => l.trim()).join('\n').trim()
-       );
-
+        );
     }
 
-    it('should format a result', async function() {
+    it('should format a result', async () => {
         await assertRun(`
             -->
             -- example of empty command: { "db": "default", "output": "vizualize" }
@@ -70,7 +71,7 @@ describe('QueryRunner', function() {
         `);
     });
 
-    it('should run multiple queries for visualizer', async function() {
+    it('should run multiple queries for visualizer', async () => {
         await assertRun(`
             SELECT 'a' test1
             SELECT 'c' test1
@@ -94,7 +95,7 @@ describe('QueryRunner', function() {
         `);
     });
 
-    it('should run multiple queries for Markdown', async function () {
+    it('should run multiple queries for Markdown', async () => {
         await assertRun(`
             --> { "db": "default", "output": "markdown" }
             SELECT 'a' test1, 'b' test2
@@ -119,7 +120,7 @@ describe('QueryRunner', function() {
         `);
     });
 
-    it('should run multiple queries for JSON', async function () {
+    it('should run multiple queries for JSON', async () => {
         await assertRun(`
             --> { "db": "default", "output": "json" }
             SELECT 'a' test1, 'b' test2
@@ -149,7 +150,7 @@ describe('QueryRunner', function() {
         `);
     });
 
-    it('should run multiple queries for CSV', async function () {
+    it('should run multiple queries for CSV', async () => {
         await assertRun(`
             --> { "db": "default", "output": "csv" }
             SELECT 'a' test1, 'b' test2
