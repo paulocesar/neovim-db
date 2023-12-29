@@ -41,7 +41,6 @@ describe('QueryRunner', function() {
         `, `
             === QUERY RESULT ===
 
-
              # id value
             -- -- -------
             #0 1  First
@@ -71,7 +70,7 @@ describe('QueryRunner', function() {
         `);
     });
 
-    it('should run multiple queries', async function() {
+    it('should run multiple queries for visualizer', async function() {
         await assertRun(`
             SELECT 'a' test1
             SELECT 'c' test1
@@ -79,7 +78,6 @@ describe('QueryRunner', function() {
             SELECT 'd' test1
         `, `
             === QUERY RESULT ===
-
 
              # test1
             -- -----
@@ -93,6 +91,31 @@ describe('QueryRunner', function() {
              # test1
             -- -----
             #0 d
+        `);
+    });
+
+    it('should run multiple queries for Markdown', async function () {
+        await assertRun(`
+            --> { "db": "default", "output": "markdown" }
+            SELECT 'a' test1, 'b' test2
+            SELECT 'c' test1, 'd' test2
+            SELECT 'b' test2, 'a' test3
+            SELECT 'd' test1, 't' test2
+        `, `
+            ### QUERY RESULT
+
+            test1 | test2
+            :-- | :--
+            a | b
+            c | d
+
+            test2 | test3
+            :-- | :--
+            b | a
+
+            test1 | test2
+            :-- | :--
+            d | t
         `);
     });
 });

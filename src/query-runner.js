@@ -141,18 +141,46 @@ class QueryRunner {
     }
 
     toMarkdown(title, results) {
-        const lines = [ ];
+        let displayLines = [ ];
+
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            lines.push(`### ${title}`);
-            lines.push('');
+            addLine(`### ${title}`);
         }
 
-        if (!lines.length) {
-            lines.push('empty');
-            return lines;
+        if (!results.length) {
+            addLine('empty');
+            return displayLines;
         }
 
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildMarkdown(g));
+        }
+
+        return displayLines;
+    }
+
+    _buildMarkdown(results) {
+        const lines = [ ];
         const keys = Object.keys(results[0]);
+
         lines.push(keys.join(' | '));
 
         const splitter = `:--${' | :--'.repeat(keys.length - 1)}`;
@@ -196,7 +224,6 @@ class QueryRunner {
 
         if (title) {
             addLine(`=== ${title} ===`);
-            addLine('');
         }
 
         if (!results.length) {
