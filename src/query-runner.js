@@ -14,7 +14,7 @@ class QueryRunner {
 
         if (!this.hasDbSettings) { return; }
 
-        this.loadSettins();
+        this.loadSettings();
         if (!this.hasGoodSettings) { return; }
 
         const lines = nvimLines.map((l) => l.trim()).filter((l) => l);
@@ -39,7 +39,7 @@ class QueryRunner {
         if (query.sql) { this.queries.push(query); }
     }
 
-    loadSettins() {
+    loadSettings() {
         try {
             this.dbSettings = JSON.parse(fs.readFileSync(configFilename));
         } catch(ex) {
