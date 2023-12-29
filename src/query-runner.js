@@ -194,13 +194,45 @@ class QueryRunner {
     }
 
     toCsv(title, results) {
-        const lines = [ ];
+        let displayLines = [ ];
+
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            lines.push(`=== ${title} ===`);
-            lines.push('');
+            addLine(`=== ${title} ===`);
         }
 
-        if (!results.length) { return lines; }
+        if (!results.length) {
+            addLine('"empty"');
+            return displayLines;
+        }
+
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildCsv(g));
+        }
+
+        return displayLines;
+
+    }
+
+    _buildCsv(results) {
+        const lines = [ ];
 
         function format(v) {
             const f = `${v}`.replace(/"/g, '');

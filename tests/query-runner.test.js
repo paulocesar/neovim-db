@@ -148,4 +148,26 @@ describe('QueryRunner', function() {
             ]
         `);
     });
+
+    it('should run multiple queries for CSV', async function () {
+        await assertRun(`
+            --> { "db": "default", "output": "csv" }
+            SELECT 'a' test1, 'b' test2
+            SELECT 'c' test1, 'd' test2
+            SELECT 'b' test2, 'a' test3
+            SELECT 'd' test1, 't' test2
+        `, `
+            === QUERY RESULT ===
+
+            "test1","test2"
+            "a","b"
+            "c","d"
+
+            "test2","test3"
+            "b","a"
+
+            "test1","test2"
+            "d","t"
+        `);
+    });
 });
