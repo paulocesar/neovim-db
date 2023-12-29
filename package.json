@@ -23,14 +23,14 @@
   },
   "homepage": "https://github.com/paulocesar/neovim-db#readme",
   "dependencies": {
-    "knex": "^0.21.1",
-    "mssql": "^6.2.0",
-    "mysql": "^2.18.1",
-    "oracledb": "^4.2.0",
-    "pg": "^8.1.0",
-    "sqlite3": "^4.2.0"
+    "knex": "3.1.0",
+    "mssql": "10.0.1",
+    "mysql": "2.18.1",
+    "oracledb": "6.3.0",
+    "pg": "8.11.3",
+    "sqlite3": "5.1.7-rc.0"
   },
   "devDependencies": {
-    "mocha": "^7.1.2"
+    "mocha": "10.2.0"
   }
 }
