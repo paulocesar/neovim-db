@@ -41,13 +41,13 @@ module.exports = (plugin) => {
 
         nvim.window = windowResult;
         await nvim.command('1,$d');
-        const lines = await r.results()
+        const lines = await r.results();
 
         await windowResult.buffer.append(lines, 0);
         await nvim.command('1');
     }
 
-    plugin.registerCommand('DbRunQuery', async function() {
+    plugin.registerCommand('DbRunQuery', async function dbRunQuery() {
         const windowQuery = await nvim.window;
         const windowResult = await resolveWindowResult();
 
@@ -55,4 +55,4 @@ module.exports = (plugin) => {
 
         nvim.window = windowQuery;
     }, { sync: false });
-}
+};

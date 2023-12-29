@@ -5,7 +5,7 @@ const knex = require('knex');
 
 const configFilename = path.resolve(os.homedir(), '.nvim-db.json');
 
-const clients = [ 'mssql', 'mysql', 'pg', 'sqlite3', 'mysql2', 'oracledb' ];
+const clients = ['mssql', 'mysql', 'pg', 'sqlite3', 'mysql2', 'oracledb'];
 
 class QueryRunner {
     constructor(nvimLines, width) {
@@ -14,7 +14,7 @@ class QueryRunner {
 
         if (!this.hasDbSettings) { return; }
 
-        this.loadSettins();
+        this.loadSettings();
         if (!this.hasGoodSettings) { return; }
 
         const lines = nvimLines.map((l) => l.trim()).filter((l) => l);
@@ -39,10 +39,10 @@ class QueryRunner {
         if (query.sql) { this.queries.push(query); }
     }
 
-    loadSettins() {
+    loadSettings() {
         try {
             this.dbSettings = JSON.parse(fs.readFileSync(configFilename));
-        } catch(ex) {
+        } catch (ex) {
             this.hasGoodSettings = false;
             return;
         }
@@ -59,6 +59,8 @@ class QueryRunner {
                 this.hasGoodSettings = false;
                 break;
             }
+
+            s.connection.multipleStatements = true;
         }
     }
 
@@ -88,7 +90,7 @@ class QueryRunner {
                     outputs.visualize;
             }
             if (json.title) { settings.title = json.title || 'QUERY RESULT'; }
-        } catch(ex) {
+        } catch (ex) {
             return settings;
         }
 
@@ -114,10 +116,10 @@ class QueryRunner {
                 const results = await db.raw(sql);
 
                 const formatted = settings.output(settings.title, results);
-                lines = lines.concat(formatted).concat([ '', '' ]);
-            } catch(ex) {
+                lines = lines.concat(formatted).concat(['', '']);
+            } catch (ex) {
                 lines = lines.concat(ex.toString().split('\n'))
-                    .concat([ '', '' ]);
+                    .concat(['', '']);
             }
         }
 
@@ -139,18 +141,46 @@ class QueryRunner {
     }
 
     toMarkdown(title, results) {
-        const lines = [ ];
+        let displayLines = [ ];
+
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            lines.push(`### ${title}`);
-            lines.push('');
+            addLine(`### ${title}`);
         }
 
-        if (!lines.length) {
-            lines.push('empty');
-            return lines;
+        if (!results.length) {
+            addLine('empty');
+            return displayLines;
         }
 
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildMarkdown(g));
+        }
+
+        return displayLines;
+    }
+
+    _buildMarkdown(results) {
+        const lines = [ ];
         const keys = Object.keys(results[0]);
+
         lines.push(keys.join(' | '));
 
         const splitter = `:--${' | :--'.repeat(keys.length - 1)}`;
@@ -164,13 +194,44 @@ class QueryRunner {
     }
 
     toCsv(title, results) {
-        const lines = [ ];
+        let displayLines = [ ];
+
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            lines.push(`=== ${title} ===`);
-            lines.push('');
+            addLine(`=== ${title} ===`);
         }
 
-        if (!results.length) { return lines; }
+        if (!results.length) {
+            addLine('"empty"');
+            return displayLines;
+        }
+
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildCsv(g));
+        }
+
+        return displayLines;
+    }
+
+    _buildCsv(results) {
+        const lines = [ ];
 
         function format(v) {
             const f = `${v}`.replace(/"/g, '');
@@ -190,14 +251,42 @@ class QueryRunner {
     toVisualizationTable(title, results) {
         let displayLines = [ ];
 
+        const addLine = (l) => displayLines.push(l);
+
         if (title) {
-            displayLines = [ `=== ${title} ===`, '' ];
+            addLine(`=== ${title} ===`);
         }
 
         if (!results.length) {
-            displayLines.push('(empty)');
+            addLine('(empty)');
             return displayLines;
         }
+
+        const resultGroups = [ ];
+        let lastKeys = [ ];
+
+        for (const r of results) {
+            const cols = Object.keys(r);
+
+            if (lastKeys.join('|') !== cols.join('|')) {
+                resultGroups.push([ ]);
+                lastKeys = cols;
+            }
+
+            const lastGroup = resultGroups[resultGroups.length - 1];
+            lastGroup.push(r);
+        }
+
+        for (const g of resultGroups) {
+            displayLines = displayLines.concat('')
+                .concat(this._buildVisualizationTable(g));
+        }
+
+        return displayLines;
+    }
+
+    _buildVisualizationTable(results) {
+        let displayLines = [ ];
 
         const countLen = `${results.length}`.length;
         const cols = [ ];
@@ -206,7 +295,7 @@ class QueryRunner {
             let maxLen = col.length;
             for (const r of results) {
                 const colLen = `${r[col]}`.length + 1;
-                if (colLen > maxLen) { maxLen = colLen };
+                if (colLen > maxLen) { maxLen = colLen; }
             }
 
             cols.push({ name: col, length: maxLen });
@@ -225,7 +314,7 @@ class QueryRunner {
 
                 for (const idx in results) {
                     const repeatCol = countLen - (idx.toString().length);
-                    lines[Number(idx) + 2] = `${' '.repeat(repeatCol)}#${idx} `
+                    lines[Number(idx) + 2] = `${' '.repeat(repeatCol)}#${idx} `;
                 }
             }
 
